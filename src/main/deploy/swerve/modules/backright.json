@@ -5,12 +5,12 @@
   },
   "absoluteEncoderOffset": 0.2,
   "drive": {
-    "type": "sparkmax_neo",
+    "type": "krakenx60",
     "id": 8,
     "canbus": "rio"
   },
   "inverted": {
-    "drive": true,
+    "drive": false,
     "angle": true
   },
   "angle": {

@@ -72,16 +72,20 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
+    swerveDrive.resetIMU();
     swerveDrive.driveCommand(
-      () -> MathUtil.applyDeadband(-driverController.getLeftY(), 0.05),
-      () -> MathUtil.applyDeadband(-driverController.getLeftX(), 0.05),
-      () -> MathUtil.applyDeadband(driverController.getRightY(), 0.05),
-      () -> MathUtil.applyDeadband(driverController.getRightX(), 0.05)
+      () -> MathUtil.applyDeadband(-driverController.getLeftY(), 0.1),
+      () -> MathUtil.applyDeadband(-driverController.getLeftX(), 0.1),
+      () -> MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
+      () -> MathUtil.applyDeadband(-driverController.getRightY(), 0.1)
     ).schedule();
   }
 
   @Override
   public void teleopPeriodic() {
+    if (driverController.getAButton()) {
+      swerveDrive.resetIMU();
+    }
   }
 
   @Override
