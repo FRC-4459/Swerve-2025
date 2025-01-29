@@ -4,10 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.DoubleSupplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import swervelib.parser.SwerveParser;
@@ -22,6 +30,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private double maximumSpeed;
     private File swerveJsonDirectory;
     private SwerveDrive swerveDrive;
+    private AutoBuilder autoBuilder;
+    private RobotConfig robotConfig;
 
     public SwerveSubsystem() {
         maximumSpeed = Units.feetToMeters(15);
@@ -34,14 +44,72 @@ public class SwerveSubsystem extends SubsystemBase {
             System.out.println("that directory does not exist ;-;");
         }
 
+        try {
+          robotConfig = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+          // Handle exception as needed
+          e.printStackTrace();
+        }
+
+        setupPathPlanner();
+
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-        swerveDrive.headingCorrection = false;
+        swerveDrive.headingCorrection = true;
     }
 
     public void resetIMU() {
-      ADIS16470_IMU imu = (ADIS16470_IMU) swerveDrive.getGyro().getIMU();
-      imu.reset();
+      swerveDrive.zeroGyro();
     }
+
+    public void setupPathPlanner()
+  {
+      final boolean enableFeedforward = true;
+      // Configure AutoBuilder last
+      AutoBuilder.configure(
+          this::getPose,
+          this::resetPose,
+          this::getRobotRelativeSpeeds,
+          (speedsRobotRelative, moduleFeedForwards) -> {
+            if (enableFeedforward)
+            {
+              swerveDrive.drive(
+                  speedsRobotRelative,
+                  swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
+                  moduleFeedForwards.linearForces()
+                               );
+            } else
+            {
+              swerveDrive.setChassisSpeeds(speedsRobotRelative);
+            }
+          },
+          // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+          new PPHolonomicDriveController(
+              // PPHolonomicController is the built in path following controller for holonomic drive trains
+              new PIDConstants(.5, 0.0, 0.0),
+              // Translation PID constants
+              new PIDConstants(.8, 0.0, 0.0)
+              // Rotation PID constants
+          ),
+          robotConfig,
+          // The robot configuration
+          () -> {
+            // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent())
+            {
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
+          },
+          this
+                           );
+    // //Preload PathPlanner Path finding
+    // // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
+    // PathfindingCommand.warmupCommand().schedule();
+  }
 
     public void driveDriveMotors(double setpoint) {
       SwerveModule modules[] = swerveDrive.getModules();
@@ -61,11 +129,24 @@ public class SwerveSubsystem extends SubsystemBase {
     return run(() -> {
       Translation2d scaledInputs = SwerveMath.scaleTranslation(new Translation2d(translationX.getAsDouble(),
                                                                                  translationY.getAsDouble()), 0.8);
+
       swerveDrive.drive(swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(), scaledInputs.getY(),
                                                                       headingX.getAsDouble(),
                                                                       headingY.getAsDouble(),
                                                                       swerveDrive.getOdometryHeading().getRadians(),
                                                                       maximumSpeed));
     });
+  }
+
+  public Pose2d getPose() {
+    return swerveDrive.getPose();
+  }
+
+  public void resetPose(Pose2d desired) {
+    swerveDrive.resetOdometry(desired);
+  }
+
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return swerveDrive.getRobotVelocity();
   }
 }

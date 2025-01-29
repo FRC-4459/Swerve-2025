@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.MathUtil;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import swervelib.parser.SwerveParser;
 import swervelib.SwerveDrive;
 
@@ -56,6 +57,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+
+    Pose2d p = new Pose2d();
+    swerveDrive.resetPose(new Pose2d(0, 0, new Rotation2d(0)));
+    swerveDrive.resetIMU();
   }
 
   @Override
@@ -72,7 +77,10 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
+    Pose2d p = new Pose2d();
+    swerveDrive.resetPose(new Pose2d(0, 0, new Rotation2d(0)));
     swerveDrive.resetIMU();
+
     swerveDrive.driveCommand(
       () -> MathUtil.applyDeadband(-driverController.getLeftY(), 0.1),
       () -> MathUtil.applyDeadband(-driverController.getLeftX(), 0.1),
