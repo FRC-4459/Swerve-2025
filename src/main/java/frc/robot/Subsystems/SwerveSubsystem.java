@@ -3,6 +3,7 @@ package frc.robot.Subsystems;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -14,7 +15,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,11 +30,11 @@ public class SwerveSubsystem extends SubsystemBase {
     private double maximumSpeed;
     private File swerveJsonDirectory;
     private SwerveDrive swerveDrive;
-    private AutoBuilder autoBuilder;
+    // private AutoBuilder autoBuilder;
     private RobotConfig robotConfig;
 
     public SwerveSubsystem() {
-        maximumSpeed = Units.feetToMeters(15);
+        maximumSpeed = Units.feetToMeters(9);
         swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
 
         try {
@@ -54,7 +54,10 @@ public class SwerveSubsystem extends SubsystemBase {
         setupPathPlanner();
 
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-        swerveDrive.headingCorrection = true;
+        swerveDrive.setHeadingCorrection(false);
+        swerveDrive.setCosineCompensator(false);
+        swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
+        
     }
 
     public void resetIMU() {
@@ -123,6 +126,19 @@ public class SwerveSubsystem extends SubsystemBase {
       modules[3].getAngleMotor().set(setpoint);
     }
 
+    public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
+      {
+        return run(() -> {
+          // Make the robot move
+          swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
+                                translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                                translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
+                            Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
+                            true,
+                            false);
+        });
+      }  
+  
   public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier headingX,
                               DoubleSupplier headingY)
   {
@@ -138,6 +154,16 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
+  public void driveFieldOriented(ChassisSpeeds velocity) {
+    swerveDrive.driveFieldOriented(velocity);
+  }
+
+  public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
+    return run(() -> {
+      swerveDrive.driveFieldOriented(velocity.get());
+    });
+  }
+
   public Pose2d getPose() {
     return swerveDrive.getPose();
   }
@@ -148,5 +174,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return swerveDrive.getRobotVelocity();
+  }
+
+  public SwerveDrive getSwerveDrive() {
+    return swerveDrive;
   }
 }

@@ -1,6 +1,6 @@
 package frc.robot;
 
-public final class Constants {
+public final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
 
     public static final int pdpID = 0;
@@ -20,5 +20,7 @@ public final class Constants {
     public static final int topRightCANCoderID = 10;
     public static final int bottomLeftCANCoderID = 11;
     public static final int bottomRightCANCoderID = 12;
+
+    public static final double DEADBAND = 0.1;
 }
 
