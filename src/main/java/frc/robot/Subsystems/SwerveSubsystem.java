@@ -34,11 +34,12 @@ public class SwerveSubsystem extends SubsystemBase {
     private RobotConfig robotConfig;
 
     public SwerveSubsystem() {
-        maximumSpeed = Units.feetToMeters(9);
+        maximumSpeed = Units.feetToMeters(13.5);
         swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
 
         try {
             swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(maximumSpeed);
+            swerveDrive.setChassisDiscretization(true, 0.02);
         } catch (IOException e) {
             System.out.println(e);
             System.out.println("that directory does not exist ;-;");
