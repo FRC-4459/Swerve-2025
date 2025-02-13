@@ -4,9 +4,17 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.io.File;
 
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -19,13 +27,26 @@ public class Robot extends TimedRobot {
   private SwerveSubsystem swerveDrive;
   private final RobotContainer m_robotContainer;
 
+  private final Distance kLedSpacing = Meters.of(1 / 120.0);
+  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+  private final LEDPattern m_scrollingRainbow =
+    m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
+
+  private final AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(70);
+  private final AddressableLED led = new AddressableLED(0);
+  
   public Robot() {
     m_robotContainer = new RobotContainer();
+    led.setLength(ledBuffer.getLength());
+    led.setData(ledBuffer);
+    led.start();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    m_scrollingRainbow.applyTo(ledBuffer);
+    led.setData(ledBuffer);
   }
 
   @Override
