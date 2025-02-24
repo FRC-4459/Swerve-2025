@@ -25,28 +25,18 @@ import frc.robot.Subsystems.*;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private SwerveSubsystem swerveDrive;
+  private LedSubsystem ledSubsystem;
   private final RobotContainer m_robotContainer;
-
-  private final Distance kLedSpacing = Meters.of(1 / 120.0);
-  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
-  private final LEDPattern m_scrollingRainbow =
-    m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
-
-  private final AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(70);
-  private final AddressableLED led = new AddressableLED(0);
   
   public Robot() {
+    ledSubsystem = new LedSubsystem();
     m_robotContainer = new RobotContainer();
-    led.setLength(ledBuffer.getLength());
-    led.setData(ledBuffer);
-    led.start();
+    
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    m_scrollingRainbow.applyTo(ledBuffer);
-    led.setData(ledBuffer);
   }
 
   @Override
@@ -76,6 +66,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    ledSubsystem.startLed().schedule();
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
