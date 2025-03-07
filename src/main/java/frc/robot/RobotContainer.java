@@ -8,6 +8,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.Commands.*;
@@ -20,6 +21,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
   final CommandXboxController driverController = new CommandXboxController(0);
   private SwerveSubsystem swerveDrive = new SwerveSubsystem();
+  private ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 
   // the following code is swiped from broncbotz 3481's YAGSL example code
   /**
@@ -83,13 +85,18 @@ public class RobotContainer {
     Command driveFieldOrientedDirectAngleKeyboard = swerveDrive.driveFieldOriented(driveDirectAngleKeyboard);
     Command driveFieldOrientedAnglularVelocityKeyboard = swerveDrive.driveFieldOriented(driveAngularVelocityKeyboard);
 
+    Command liftElevator = Commands.run(() -> elevatorSubsystem.setElevatorSpeed(0.8, false));
+    Command dropElevator = Commands.run(() -> elevatorSubsystem.setElevatorSpeed(-0.8, false));
+
     if (RobotBase.isSimulation()) {
       swerveDrive.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
     } else {
       swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
-  }
 
+    driverController.rightBumper().whileTrue(liftElevator);
+    driverController.leftBumper().whileTrue(dropElevator);
+  }
 
   public Command getAutonomousCommand() {
     return new PathPlannerAuto("erm");
