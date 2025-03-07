@@ -85,17 +85,14 @@ public class RobotContainer {
     Command driveFieldOrientedDirectAngleKeyboard = swerveDrive.driveFieldOriented(driveDirectAngleKeyboard);
     Command driveFieldOrientedAnglularVelocityKeyboard = swerveDrive.driveFieldOriented(driveAngularVelocityKeyboard);
 
-    Command liftElevator = Commands.run(() -> elevatorSubsystem.setElevatorSpeed(0.8, false));
-    Command dropElevator = Commands.run(() -> elevatorSubsystem.setElevatorSpeed(-0.8, false));
-
     if (RobotBase.isSimulation()) {
       swerveDrive.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
     } else {
       swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-    driverController.rightBumper().whileTrue(liftElevator);
-    driverController.leftBumper().whileTrue(dropElevator);
+    driverController.rightBumper().whileTrue(elevatorSubsystem.liftElevator());
+    driverController.leftBumper().whileTrue(elevatorSubsystem.dropElevator());
   }
 
   public Command getAutonomousCommand() {

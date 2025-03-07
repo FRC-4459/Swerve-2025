@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LedSubsystem extends SubsystemBase{
+public class LedSubsystem extends SubsystemBase {
 
     private final Distance kLedSpacing = Meters.of(1 / 120.0);
     private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
@@ -82,7 +82,7 @@ public class LedSubsystem extends SubsystemBase{
                     throw new ArrayIndexOutOfBoundsException("Some parameters of i and advance are negative after realMod()");
                 }
             }
-            led.setData(ledBuffer);
+            led.setData(ledBuffer); 
         });
     }
 }
