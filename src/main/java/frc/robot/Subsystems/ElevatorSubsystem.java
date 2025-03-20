@@ -2,11 +2,9 @@ package frc.robot.Subsystems;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.controller.PIDController;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Commands.*;
 
 public class ElevatorSubsystem extends SubsystemBase {
     public SparkMax elevatorMotor;
@@ -19,9 +17,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double distToTop;
 
     public ElevatorSubsystem() {
-        elevatorMotor1 = new SparkMax(0, SparkMax.MotorType.kBrushless);
+        elevatorMotor1 = new SparkMax(13, SparkMax.MotorType.kBrushless);
         elevatorEncoder1 = elevatorMotor1.getEncoder();
-        elevatorMotor2 = new SparkMax(1, SparkMax.MotorType.kBrushless);
+        elevatorMotor2 = new SparkMax(14, SparkMax.MotorType.kBrushless);
         elevatorEncoder2 = elevatorMotor2.getEncoder();
     } 
 
@@ -59,10 +57,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command liftElevator() { 
-        return this.run(() -> this.setElevatorSpeed(0.8, false));
+        return new RunElevator(this, 0.8);
     }
 
     public Command dropElevator() {
-        return this.run(() -> this.setElevatorSpeed(-0.8, false));
+        return new RunElevator(this, -0.8);
     }
 }
