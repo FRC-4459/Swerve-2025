@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase {
     private SparkMax motor;
 
-    IntakeSubsystem() {
+    public IntakeSubsystem() {
         motor = new SparkMax(15, MotorType.kBrushless);
     }
 

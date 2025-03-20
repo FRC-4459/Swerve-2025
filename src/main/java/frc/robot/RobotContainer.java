@@ -21,7 +21,9 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
   final CommandXboxController driverController = new CommandXboxController(0);
   private SwerveSubsystem swerveDrive = new SwerveSubsystem();
-  private ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+  // // private ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+  private IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private LedSubsystem ledSubsystem = new LedSubsystem();
 
   // the following code is swiped from broncbotz 3481's YAGSL example code
   /**
@@ -76,6 +78,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     configureBindings();
+    ledSubsystem.startLed().schedule();
   }
 
   private void configureBindings() {
@@ -91,8 +94,12 @@ public class RobotContainer {
       swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-    driverController.rightBumper().whileTrue(elevatorSubsystem.liftElevator());
-    driverController.leftBumper().whileTrue(elevatorSubsystem.dropElevator());
+    // driverController.rightBumper().whileTrue(elevatorSubsystem.liftElevator());
+    // driverController.leftBumper().whileTrue(elevatorSubsystem.dropElevator());
+
+
+    driverController.rightTrigger().whileTrue(Commands.run(() -> new RunIntake(intakeSubsystem, driverController.getRightTriggerAxis())));
+    driverController.leftTrigger().whileTrue(Commands.run(() -> new RunIntake(intakeSubsystem, -driverController.getLeftTriggerAxis())));
   }
 
   public Command getAutonomousCommand() {

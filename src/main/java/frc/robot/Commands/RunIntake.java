@@ -31,12 +31,12 @@ public class RunIntake extends Command {
             timer.reset();
             timer.start();
         }
+
+        intake.run(s);
     }
 
     @Override
-    public void execute() {
-        intake.run(s);
-    }
+    public void execute() { }
 
     @Override
     public void end(boolean interruped) {

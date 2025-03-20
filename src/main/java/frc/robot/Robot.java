@@ -25,13 +25,10 @@ import frc.robot.Subsystems.*;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private SwerveSubsystem swerveDrive;
-  private LedSubsystem ledSubsystem;
   private final RobotContainer m_robotContainer;
   
   public Robot() {
-    ledSubsystem = new LedSubsystem();
     m_robotContainer = new RobotContainer();
-    
   }
 
   @Override
@@ -66,8 +63,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    ledSubsystem.startLed().schedule();
-
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
