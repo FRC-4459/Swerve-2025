@@ -36,7 +36,9 @@ public class RunIntake extends Command {
     }
 
     @Override
-    public void execute() { }
+    public void execute() {
+        intake.run(0.5);
+    }
 
     @Override
     public void end(boolean interruped) {
