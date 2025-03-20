@@ -98,8 +98,8 @@ public class RobotContainer {
     // driverController.leftBumper().whileTrue(elevatorSubsystem.dropElevator());
 
 
-    driverController.rightTrigger().whileTrue(Commands.run(() -> new RunIntake(intakeSubsystem, driverController.getRightTriggerAxis())));
-    driverController.leftTrigger().whileTrue(Commands.run(() -> new RunIntake(intakeSubsystem, -driverController.getLeftTriggerAxis())));
+    driverController.rightTrigger().whileTrue(new RunIntake(intakeSubsystem, driverController.getRightTriggerAxis()));
+    driverController.leftTrigger().whileTrue(new RunIntake(intakeSubsystem, -driverController.getLeftTriggerAxis()));
   }
 
   public Command getAutonomousCommand() {
