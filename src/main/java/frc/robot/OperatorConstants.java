@@ -22,5 +22,9 @@ public final class OperatorConstants {
     public static final int bottomRightCANCoderID = 12;
 
     public static final double DEADBAND = 0.1;
+
+    public static final double elevatorL1CM = 91.44;
+    public static final double elevatorL2CM = 121.92;
+    public static final double elevatorTroughCM = 66.04;
 }
 

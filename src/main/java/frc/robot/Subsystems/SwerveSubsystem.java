@@ -34,7 +34,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private RobotConfig robotConfig;
 
     public SwerveSubsystem() {
-        maximumSpeed = Units.feetToMeters(13.5);
+        maximumSpeed = Units.feetToMeters(10);
         swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
 
         try {

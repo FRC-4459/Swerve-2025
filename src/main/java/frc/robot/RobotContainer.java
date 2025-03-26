@@ -5,7 +5,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -21,11 +23,11 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
   final CommandXboxController driverController = new CommandXboxController(0);
   private SwerveSubsystem swerveDrive = new SwerveSubsystem();
-  // // private ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+  private ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
   private IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private LedSubsystem ledSubsystem = new LedSubsystem();
 
-  // the following code is swiped from broncbotz 3481's YAGSL example code
+  // the following code is shamelessly swiped from broncbotz 3481's YAGSL example code
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
@@ -77,8 +79,20 @@ public class RobotContainer {
                                                                                .headingWhile(true);
 
   public RobotContainer() {
+    DriverStation.silenceJoystickConnectionWarning(true);
     configureBindings();
     ledSubsystem.startLed().schedule();
+
+    Command raiseElevatorL1 = new SetElevatorPosition(elevatorSubsystem, OperatorConstants.elevatorL1CM);
+    Command raiseElevatorL2 = new SetElevatorPosition(elevatorSubsystem, OperatorConstants.elevatorL2CM);
+    Command lowerElevator = new SetElevatorPosition(elevatorSubsystem, 0);
+    Command output = new RunIntake(intakeSubsystem, 0.25, 0.4);
+    Command intake = new RunIntake(intakeSubsystem, -0.25, 0.5);
+
+    NamedCommands.registerCommand("RaiseElevatorL1", raiseElevatorL1);
+    NamedCommands.registerCommand("Output", output);
+    NamedCommands.registerCommand("LowerElevator", lowerElevator);
+    NamedCommands.registerCommand("Intake", intake);
   }
 
   private void configureBindings() {
@@ -94,15 +108,17 @@ public class RobotContainer {
       swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-    // driverController.rightBumper().whileTrue(elevatorSubsystem.liftElevator());
-    // driverController.leftBumper().whileTrue(elevatorSubsystem.dropElevator());
+    driverController.y().whileTrue(elevatorSubsystem.liftElevator());
+    driverController.b().whileTrue(elevatorSubsystem.dropElevator());
 
+    driverController.rightTrigger().whileTrue(new RunIntake(intakeSubsystem, 0.25));
+    driverController.leftTrigger().whileTrue(new RunIntake(intakeSubsystem, -0.25));
 
-    driverController.rightTrigger().whileTrue(Commands.run(() -> new RunIntake(intakeSubsystem, driverController.getRightTriggerAxis())));
-    driverController.leftTrigger().whileTrue(Commands.run(() -> new RunIntake(intakeSubsystem, -driverController.getLeftTriggerAxis())));
+    driverController.x().onTrue(Commands.run(() -> elevatorSubsystem.zeroEncoders()));
+    driverController.a().onTrue(Commands.run(() -> swerveDrive.resetIMU()));
   }
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("erm");
+    return new PathPlannerAuto("barge1");
   }
 }
