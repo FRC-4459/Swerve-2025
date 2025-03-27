@@ -108,11 +108,11 @@ public class RobotContainer {
       swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-    driverController.rightBumper().whileTrue(elevatorSubsystem.liftElevator());
-    driverController.leftBumper().whileTrue(elevatorSubsystem.dropElevator());
+    driverController.rightBumper().whileTrue(elevatorSubsystem.dropElevator());
+    driverController.leftBumper().whileTrue(elevatorSubsystem.liftElevator());
 
-    driverController.rightTrigger().whileTrue(new RunIntake(intakeSubsystem, 0.25));
-    driverController.leftTrigger().whileTrue(new RunIntake(intakeSubsystem, -0.25));
+    driverController.rightTrigger().whileTrue(new RunIntake(intakeSubsystem, -0.25));
+    driverController.leftTrigger().whileTrue(new RunIntake(intakeSubsystem, 0.25));
 
     driverController.x().onTrue(Commands.run(() -> elevatorSubsystem.zeroEncoders()));
     driverController.a().onTrue(Commands.run(() -> swerveDrive.resetIMU()));

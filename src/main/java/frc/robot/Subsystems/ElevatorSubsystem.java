@@ -42,14 +42,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void setElevatorSpeed(double speed) {
-        elevatorMotor1.set(speed);
-        elevatorMotor2.set(-speed);
+        elevatorMotor1.set(-speed);
+        elevatorMotor2.set(speed);
     }
 
     public void setElevatorSpeed(double speed, boolean flip) {
+        System.out.println(elevatorEncoder1.getPosition());
         // Refuse to run the elevator down if it's already bottomed.
-        if (speed < 0 && elevatorEncoder1.getPosition() < 0.25) {
-            System.out.println("Elevator bottomed out. Refusing to run down.");
+        if (speed > 0 && elevatorEncoder1.getPosition() > -0.05) {
+            System.out.println("Elevator bottomed out. Refusing to run down. " + elevatorEncoder1.getPosition());
+            setElevatorSpeed(0);
             return;
         }
 
