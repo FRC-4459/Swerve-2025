@@ -35,12 +35,12 @@ public class RunElevator extends Command {
 
     @Override
     public void execute() {
-        elevator.setElevatorSpeed(s, false);
+        elevator.setElevatorSpeed(s, true);
     }
 
     @Override
     public void end(boolean interruped) {
-        elevator.setElevatorSpeed(0, false);
+        elevator.setElevatorSpeed(0, true);
     }
 
     @Override

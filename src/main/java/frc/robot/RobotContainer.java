@@ -79,10 +79,6 @@ public class RobotContainer {
                                                                                .headingWhile(true);
 
   public RobotContainer() {
-    DriverStation.silenceJoystickConnectionWarning(true);
-    configureBindings();
-    ledSubsystem.startLed().schedule();
-
     Command raiseElevatorL1 = new SetElevatorPosition(elevatorSubsystem, OperatorConstants.elevatorL1CM);
     Command raiseElevatorL2 = new SetElevatorPosition(elevatorSubsystem, OperatorConstants.elevatorL2CM);
     Command lowerElevator = new SetElevatorPosition(elevatorSubsystem, 0);
@@ -93,6 +89,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("Output", output);
     NamedCommands.registerCommand("LowerElevator", lowerElevator);
     NamedCommands.registerCommand("Intake", intake);
+
+    DriverStation.silenceJoystickConnectionWarning(true);
+    configureBindings();
+    ledSubsystem.startLed().schedule();
   }
 
   private void configureBindings() {
@@ -108,8 +108,8 @@ public class RobotContainer {
       swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-    driverController.y().whileTrue(elevatorSubsystem.liftElevator());
-    driverController.b().whileTrue(elevatorSubsystem.dropElevator());
+    driverController.rightBumper().whileTrue(elevatorSubsystem.liftElevator());
+    driverController.leftBumper().whileTrue(elevatorSubsystem.dropElevator());
 
     driverController.rightTrigger().whileTrue(new RunIntake(intakeSubsystem, 0.25));
     driverController.leftTrigger().whileTrue(new RunIntake(intakeSubsystem, -0.25));

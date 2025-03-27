@@ -4,7 +4,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Commands.*;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -14,13 +13,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     private RelativeEncoder elevatorEncoder2;
     // private double distToBottom;
     // private double distToTop;
-    private double sprocketDiameterCM = 3.58; // arbitrary value for now
+    private double sprocketDiameterCM = 3.58;
 
     public ElevatorSubsystem() {
         elevatorMotor1 = new SparkMax(13, SparkMax.MotorType.kBrushless);
         elevatorEncoder1 = elevatorMotor1.getEncoder();
         elevatorMotor2 = new SparkMax(14, SparkMax.MotorType.kBrushless);
         elevatorEncoder2 = elevatorMotor2.getEncoder();
+
+        this.zeroEncoders();
     } 
 
     public RelativeEncoder getElevatorEncoder() {
@@ -46,6 +47,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void setElevatorSpeed(double speed, boolean flip) {
+        // Refuse to run the elevator down if it's already bottomed.
+        if (speed < 0 && elevatorEncoder1.getPosition() < 0.25) {
+            System.out.println("Elevator bottomed out. Refusing to run down.");
+            return;
+        }
+
         elevatorMotor1.set(speed);
 
         if (flip) {

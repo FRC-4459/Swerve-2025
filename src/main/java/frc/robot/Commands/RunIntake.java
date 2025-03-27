@@ -37,7 +37,7 @@ public class RunIntake extends Command {
 
     @Override
     public void execute() {
-        intake.run(this.s);
+        intake.run(s);
     }
 
     @Override
